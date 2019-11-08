@@ -1,4 +1,3 @@
-
 # Multilayer Perceptron vs Extreme Learning Machine
 ## An implementation and comparision
 
@@ -111,7 +110,7 @@ df.head()
   </thead>
   <tbody>
     <tr>
-      <td>2539</td>
+      <th>2539</th>
       <td>Clean &amp; quiet apt home by the park</td>
       <td>2787</td>
       <td>John</td>
@@ -129,7 +128,7 @@ df.head()
       <td>365</td>
     </tr>
     <tr>
-      <td>2595</td>
+      <th>2595</th>
       <td>Skylit Midtown Castle</td>
       <td>2845</td>
       <td>Jennifer</td>
@@ -147,7 +146,7 @@ df.head()
       <td>355</td>
     </tr>
     <tr>
-      <td>3647</td>
+      <th>3647</th>
       <td>THE VILLAGE OF HARLEM....NEW YORK !</td>
       <td>4632</td>
       <td>Elisabeth</td>
@@ -165,7 +164,7 @@ df.head()
       <td>365</td>
     </tr>
     <tr>
-      <td>3831</td>
+      <th>3831</th>
       <td>Cozy Entire Floor of Brownstone</td>
       <td>4869</td>
       <td>LisaRoxanne</td>
@@ -183,7 +182,7 @@ df.head()
       <td>194</td>
     </tr>
     <tr>
-      <td>5022</td>
+      <th>5022</th>
       <td>Entire Apt: Spacious Studio/Loft by central park</td>
       <td>7192</td>
       <td>Laura</td>
@@ -209,7 +208,77 @@ df.head()
 
 ```python
 #dropping NaN
+print(f'DF Shape before dropping NaN: {df.shape}')
 df = df.dropna(axis=0)
+print(f'DF\'s Shape after dropping NaN {df.shape}')
+```
+
+    DF Shape before dropping NaN: (48895, 15)
+    DF's Shape after dropping NaN (38821, 15)
+    
+
+**Data Exploratory**
+
+
+```python
+neighbor = df.groupby('neighbourhood_group').size()
+neighbor
+```
+
+
+
+
+    neighbourhood_group
+    Bronx              875
+    Brooklyn         16439
+    Manhattan        16621
+    Queens            4572
+    Staten Island      314
+    dtype: int64
+
+
+
+
+```python
+neighbor.plot(kind='bar', figsize=(16,9), title='Neighborhood Area')
+plt.savefig('./data/neighbor.png')
+```
+
+
+![png](output_10_0.png)
+
+
+
+```python
+avg_price = df.groupby('neighbourhood_group').agg('mean').price
+avg_price
+```
+
+
+
+
+    neighbourhood_group
+    Bronx             79.558857
+    Brooklyn         121.463289
+    Manhattan        180.071596
+    Queens            95.783683
+    Staten Island     89.964968
+    Name: price, dtype: float64
+
+
+
+
+```python
+avg_price.plot(kind='bar', figsize=(16,9), title='Average Price by Neighbourhood')
+plt.savefig('./data/avg_price.png')
+```
+
+
+![png](output_12_0.png)
+
+
+
+```python
 #drop useless feature
 df = df.drop(axis=1, labels=['name', 'host_id', 'host_name', 'neighbourhood', 'latitude', 'longitude', 'last_review'])
 df.head()
@@ -259,7 +328,7 @@ df.head()
   </thead>
   <tbody>
     <tr>
-      <td>2539</td>
+      <th>2539</th>
       <td>Brooklyn</td>
       <td>Private room</td>
       <td>149</td>
@@ -270,7 +339,7 @@ df.head()
       <td>365</td>
     </tr>
     <tr>
-      <td>2595</td>
+      <th>2595</th>
       <td>Manhattan</td>
       <td>Entire home/apt</td>
       <td>225</td>
@@ -281,7 +350,7 @@ df.head()
       <td>355</td>
     </tr>
     <tr>
-      <td>3831</td>
+      <th>3831</th>
       <td>Brooklyn</td>
       <td>Entire home/apt</td>
       <td>89</td>
@@ -292,7 +361,7 @@ df.head()
       <td>194</td>
     </tr>
     <tr>
-      <td>5022</td>
+      <th>5022</th>
       <td>Manhattan</td>
       <td>Entire home/apt</td>
       <td>80</td>
@@ -303,7 +372,7 @@ df.head()
       <td>0</td>
     </tr>
     <tr>
-      <td>5099</td>
+      <th>5099</th>
       <td>Manhattan</td>
       <td>Entire home/apt</td>
       <td>200</td>
@@ -377,7 +446,7 @@ df.head()
   </thead>
   <tbody>
     <tr>
-      <td>2539</td>
+      <th>2539</th>
       <td>1</td>
       <td>1</td>
       <td>149</td>
@@ -388,7 +457,7 @@ df.head()
       <td>365</td>
     </tr>
     <tr>
-      <td>2595</td>
+      <th>2595</th>
       <td>2</td>
       <td>0</td>
       <td>225</td>
@@ -399,7 +468,7 @@ df.head()
       <td>355</td>
     </tr>
     <tr>
-      <td>3831</td>
+      <th>3831</th>
       <td>1</td>
       <td>0</td>
       <td>89</td>
@@ -410,7 +479,7 @@ df.head()
       <td>194</td>
     </tr>
     <tr>
-      <td>5022</td>
+      <th>5022</th>
       <td>2</td>
       <td>0</td>
       <td>80</td>
@@ -421,7 +490,7 @@ df.head()
       <td>0</td>
     </tr>
     <tr>
-      <td>5099</td>
+      <th>5099</th>
       <td>2</td>
       <td>0</td>
       <td>200</td>
@@ -441,9 +510,12 @@ df.head()
 
 
 ```python
-price_div = 10000
+price_div = df.price.max()
+min_nights_div = df.minimum_nights.max()
 n_review_div = df.number_of_reviews.max()
-availa_div = 365
+review_pm_div = df.reviews_per_month.max()
+calcu_div = df.calculated_host_listings_count.max()
+availa_div = df.availability_365.max()
 ```
 
 **Regularize and Normalize Data**
@@ -451,7 +523,10 @@ availa_div = 365
 
 ```python
 df.price = df.price / price_div
+df.minimum_nights = df.minimum_nights / min_nights_div
 df.number_of_reviews = df.number_of_reviews / n_review_div
+df.reviews_per_month = df.reviews_per_month / review_pm_div
+df.calculated_host_listings_count = df.calculated_host_listings_count / calcu_div
 df.availability_365 = df.availability_365 / availa_div
 ```
 
@@ -502,17 +577,17 @@ elm_mse, mlp_mse = misc.train_both(X_train, y_train, 100)
 
 ```python
 plt.figure(figsize=(16, 9))
-plt.title("ELM vs MLP")
-plt.plot(elm_mse, 'b*-', label='ELM')
-plt.plot(mlp_mse, 'r^-', label='MLP')
+plt.title("Extreme Learning Machine vs Multilayer Perceptron Performance Comparison")
+plt.plot(elm_mse, '+-', label='Extreme Learning Machine')
+plt.plot(mlp_mse, '^-', label='Multilayer Perceptron')
 plt.legend()
 #plt.yscale('log')
-plt.savefig('./data/output.png')
+plt.savefig('./data/comparison_output.png')
 plt.show()
 ```
 
 
-![png](output_20_0.png)
+![png](output_26_0.png)
 
 
 **Testing and Evaluation**
@@ -529,8 +604,8 @@ print(f'ELM MSE: {np.mean((y_test-elm.predict(X_test))**2)}')
 print(f'MLP MSE: {np.mean((y_test-mlp.predict(X_test))**2)}')
 ```
 
-    ELM MSE: 0.00028788747489584337
-    MLP MSE: 0.000566095677992459
+    ELM MSE: 0.00027593071294904217
+    MLP MSE: 0.000303740504060233
     
 
 
