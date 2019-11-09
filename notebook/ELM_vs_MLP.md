@@ -207,80 +207,35 @@ df.head()
 
 
 ```python
-#dropping NaN
-print(f'DF Shape before dropping NaN: {df.shape}')
-df = df.dropna(axis=0)
-print(f'DF\'s Shape after dropping NaN {df.shape}')
+df.info()
 ```
 
-    DF Shape before dropping NaN: (48895, 15)
-    DF's Shape after dropping NaN (38821, 15)
+    <class 'pandas.core.frame.DataFrame'>
+    Int64Index: 48895 entries, 2539 to 36487245
+    Data columns (total 15 columns):
+    name                              48879 non-null object
+    host_id                           48895 non-null int64
+    host_name                         48874 non-null object
+    neighbourhood_group               48895 non-null object
+    neighbourhood                     48895 non-null object
+    latitude                          48895 non-null float64
+    longitude                         48895 non-null float64
+    room_type                         48895 non-null object
+    price                             48895 non-null int64
+    minimum_nights                    48895 non-null int64
+    number_of_reviews                 48895 non-null int64
+    last_review                       38843 non-null object
+    reviews_per_month                 38843 non-null float64
+    calculated_host_listings_count    48895 non-null int64
+    availability_365                  48895 non-null int64
+    dtypes: float64(3), int64(6), object(6)
+    memory usage: 6.0+ MB
     
-
-**Data Exploratory**
-
-
-```python
-neighbor = df.groupby('neighbourhood_group').size()
-neighbor
-```
-
-
-
-
-    neighbourhood_group
-    Bronx              875
-    Brooklyn         16439
-    Manhattan        16621
-    Queens            4572
-    Staten Island      314
-    dtype: int64
-
-
-
-
-```python
-neighbor.plot(kind='bar', figsize=(16,9), title='Neighborhood Area')
-plt.savefig('./data/neighbor.png')
-```
-
-
-![png](output_10_0.png)
-
-
-
-```python
-avg_price = df.groupby('neighbourhood_group').agg('mean').price
-avg_price
-```
-
-
-
-
-    neighbourhood_group
-    Bronx             79.558857
-    Brooklyn         121.463289
-    Manhattan        180.071596
-    Queens            95.783683
-    Staten Island     89.964968
-    Name: price, dtype: float64
-
-
-
-
-```python
-avg_price.plot(kind='bar', figsize=(16,9), title='Average Price by Neighbourhood')
-plt.savefig('./data/avg_price.png')
-```
-
-
-![png](output_12_0.png)
-
 
 
 ```python
 #drop useless feature
-df = df.drop(axis=1, labels=['name', 'host_id', 'host_name', 'neighbourhood', 'latitude', 'longitude', 'last_review'])
+df = df.drop(axis=1, labels=['name', 'host_id', 'host_name', 'neighbourhood', 'latitude', 'longitude', 'last_review', 'reviews_per_month'])
 df.head()
 ```
 
@@ -310,13 +265,11 @@ df.head()
       <th>price</th>
       <th>minimum_nights</th>
       <th>number_of_reviews</th>
-      <th>reviews_per_month</th>
       <th>calculated_host_listings_count</th>
       <th>availability_365</th>
     </tr>
     <tr>
       <th>id</th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -334,7 +287,6 @@ df.head()
       <td>149</td>
       <td>1</td>
       <td>9</td>
-      <td>0.21</td>
       <td>6</td>
       <td>365</td>
     </tr>
@@ -345,9 +297,18 @@ df.head()
       <td>225</td>
       <td>1</td>
       <td>45</td>
-      <td>0.38</td>
       <td>2</td>
       <td>355</td>
+    </tr>
+    <tr>
+      <th>3647</th>
+      <td>Manhattan</td>
+      <td>Private room</td>
+      <td>150</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1</td>
+      <td>365</td>
     </tr>
     <tr>
       <th>3831</th>
@@ -356,7 +317,6 @@ df.head()
       <td>89</td>
       <td>1</td>
       <td>270</td>
-      <td>4.64</td>
       <td>1</td>
       <td>194</td>
     </tr>
@@ -367,25 +327,104 @@ df.head()
       <td>80</td>
       <td>10</td>
       <td>9</td>
-      <td>0.10</td>
       <td>1</td>
       <td>0</td>
-    </tr>
-    <tr>
-      <th>5099</th>
-      <td>Manhattan</td>
-      <td>Entire home/apt</td>
-      <td>200</td>
-      <td>3</td>
-      <td>74</td>
-      <td>0.59</td>
-      <td>1</td>
-      <td>129</td>
     </tr>
   </tbody>
 </table>
 </div>
 
+
+
+
+```python
+df.info()
+```
+
+    <class 'pandas.core.frame.DataFrame'>
+    Int64Index: 48895 entries, 2539 to 36487245
+    Data columns (total 7 columns):
+    neighbourhood_group               48895 non-null object
+    room_type                         48895 non-null object
+    price                             48895 non-null int64
+    minimum_nights                    48895 non-null int64
+    number_of_reviews                 48895 non-null int64
+    calculated_host_listings_count    48895 non-null int64
+    availability_365                  48895 non-null int64
+    dtypes: int64(5), object(2)
+    memory usage: 3.0+ MB
+    
+
+
+```python
+#dropping NaN
+print(f'DF Shape before dropping NaN: {df.shape}')
+df = df.dropna(axis=0)
+print(f'DF\'s Shape after dropping NaN {df.shape}')
+```
+
+    DF Shape before dropping NaN: (48895, 7)
+    DF's Shape after dropping NaN (48895, 7)
+    
+
+**Data Exploratory**
+
+
+```python
+neighbor = df.groupby('neighbourhood_group').size()
+neighbor
+```
+
+
+
+
+    neighbourhood_group
+    Bronx             1091
+    Brooklyn         20104
+    Manhattan        21661
+    Queens            5666
+    Staten Island      373
+    dtype: int64
+
+
+
+
+```python
+neighbor.plot(kind='bar', figsize=(16,9), title='Neighborhood Area')
+plt.savefig('./data/neighbor.png')
+```
+
+
+![png](output_13_0.png)
+
+
+
+```python
+avg_price = df.groupby('neighbourhood_group').agg('mean').price
+avg_price
+```
+
+
+
+
+    neighbourhood_group
+    Bronx             87.496792
+    Brooklyn         124.383207
+    Manhattan        196.875814
+    Queens            99.517649
+    Staten Island    114.812332
+    Name: price, dtype: float64
+
+
+
+
+```python
+avg_price.plot(kind='bar', figsize=(16,9), title='Average Price by Neighbourhood')
+plt.savefig('./data/avg_price.png')
+```
+
+
+![png](output_15_0.png)
 
 
 **Encode Categorical Features**
@@ -428,13 +467,11 @@ df.head()
       <th>price</th>
       <th>minimum_nights</th>
       <th>number_of_reviews</th>
-      <th>reviews_per_month</th>
       <th>calculated_host_listings_count</th>
       <th>availability_365</th>
     </tr>
     <tr>
       <th>id</th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -452,7 +489,6 @@ df.head()
       <td>149</td>
       <td>1</td>
       <td>9</td>
-      <td>0.21</td>
       <td>6</td>
       <td>365</td>
     </tr>
@@ -463,9 +499,18 @@ df.head()
       <td>225</td>
       <td>1</td>
       <td>45</td>
-      <td>0.38</td>
       <td>2</td>
       <td>355</td>
+    </tr>
+    <tr>
+      <th>3647</th>
+      <td>2</td>
+      <td>1</td>
+      <td>150</td>
+      <td>3</td>
+      <td>0</td>
+      <td>1</td>
+      <td>365</td>
     </tr>
     <tr>
       <th>3831</th>
@@ -474,7 +519,6 @@ df.head()
       <td>89</td>
       <td>1</td>
       <td>270</td>
-      <td>4.64</td>
       <td>1</td>
       <td>194</td>
     </tr>
@@ -485,20 +529,8 @@ df.head()
       <td>80</td>
       <td>10</td>
       <td>9</td>
-      <td>0.10</td>
       <td>1</td>
       <td>0</td>
-    </tr>
-    <tr>
-      <th>5099</th>
-      <td>2</td>
-      <td>0</td>
-      <td>200</td>
-      <td>3</td>
-      <td>74</td>
-      <td>0.59</td>
-      <td>1</td>
-      <td>129</td>
     </tr>
   </tbody>
 </table>
@@ -513,7 +545,6 @@ df.head()
 price_div = df.price.max()
 min_nights_div = df.minimum_nights.max()
 n_review_div = df.number_of_reviews.max()
-review_pm_div = df.reviews_per_month.max()
 calcu_div = df.calculated_host_listings_count.max()
 availa_div = df.availability_365.max()
 ```
@@ -525,7 +556,6 @@ availa_div = df.availability_365.max()
 df.price = df.price / price_div
 df.minimum_nights = df.minimum_nights / min_nights_div
 df.number_of_reviews = df.number_of_reviews / n_review_div
-df.reviews_per_month = df.reviews_per_month / review_pm_div
 df.calculated_host_listings_count = df.calculated_host_listings_count / calcu_div
 df.availability_365 = df.availability_365 / availa_div
 ```
@@ -587,7 +617,7 @@ plt.show()
 ```
 
 
-![png](output_26_0.png)
+![png](output_28_0.png)
 
 
 **Testing and Evaluation**
@@ -604,8 +634,8 @@ print(f'ELM MSE: {np.mean((y_test-elm.predict(X_test))**2)}')
 print(f'MLP MSE: {np.mean((y_test-mlp.predict(X_test))**2)}')
 ```
 
-    ELM MSE: 0.00027593071294904217
-    MLP MSE: 0.000303740504060233
+    ELM MSE: 0.00042396675327233905
+    MLP MSE: 0.00044906896396401685
     
 
 
